@@ -1,0 +1,5 @@
+servlet.jar is used to build the project
+hsqldb.jar (in WebContent/WEB-INF/lib) - in memory database - used at runtime 
+
+servlet.jar from Tomcat 4.1.31, licensed under Apache License Version 2.0
+hsqldb.jar from  HSQLDB 1.7.3 (revision 2), licensed under hsqldb_lic.txt

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+   type="WEB"
+   name="insecure"
+   id="myeclipse.1112226466718"
+   context-root="/insecure"
+   j2ee-spec="1.3"
+   archive="insecure.war">
+   <attributes>
+      <attribute name="webrootdir" value="/WebContent" />
+   </attributes>
+</project-module>
+

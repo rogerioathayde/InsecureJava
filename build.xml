@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="package" name="WebAppSec">
+
+	<target name="init">
+		<property file="antbuild.properties" />
+		<property name="tomcat.webapps" value="${tomcat.home}/webapps"/>
+		<available file="${tomcat.webapps}" property="tomcat.webapps.present"/>
+		
+		<tstamp/>
+		
+		<property name="warname" value="insecure"/>
+		<property name="packagename" value="insecure"/>
+		<property name="packagenameWithTomcat" value="insecurewebapp-bundleTomcatJava-${DSTAMP}"/>
+		<property name="packagesrc" value="insecurewebapp-source-${DSTAMP}"/>
+		<property name="javasrc" value="insecurewebapp-java-${DSTAMP}"/>
+		<property name="project.rootpackage.path" value="com"/>
+		<property name="project.home" value="${basedir}"/>
+		<property name="project.lib" value="${project.home}/lib"/>
+		<property name="project.bundle" value="${project.home}/tomcatJREbundle"/>
+		<property name="project.tomcat.zip" value="${project.bundle}/tomcat-5.5.12.zip"/>
+		<property name="project.jre.zip" value="${project.bundle}/jre1.5.0_05-forTomcat5.zip"/>
+		<property name="project.tomcat.zipbase" value="tomcat-5.5.12"/>
+		<property name="project.src" value="${project.home}/source"/>
+		<property name="project.dist" value="${project.home}/dist"/>
+		<property name="project.webcontent" value="${project.home}/WebContent"/>
+		<property name="project.webextras" value="${project.home}/WebContent/Read-Me"/>
+		<property name="project.weblib" value="${project.home}/WebContent/WEB-INF/lib"/>
+		<property name="project.temp" value="${project.home}/temp"/>
+		<property name="project.warcontent" value="${project.home}/temp/warcontent"/>
+		<property name="project.classes" value="${project.warcontent}/WEB-INF/classes"/>
+		<path id="project.class.path">
+			<pathelement path="${classpath}"/>
+			<fileset dir="${project.lib}">
+				<include name="**/*.jar"/>
+			</fileset>
+			<fileset dir="${project.weblib}">
+				<include name="**/*.jar"/>
+			</fileset>
+		</path>
+		
+		<mkdir dir="${project.dist}"/>
+		<delete dir="${project.temp}"/>
+		<mkdir dir="${project.temp}"/>
+		<delete dir="${project.classes}"/>
+		<mkdir dir="${project.classes}"/>
+	</target>
+
+	<target name="check-tomcat" depends="init" unless="tomcat.webapps.present">
+		<fail message="Cannot continue because tomcat.home (='${tomcat.home}') property has not been changed in the antbuild.properties file"/>
+	</target>
+
+
+	<target depends="init" name="create-war">
+		<delete dir="${project.warcontent}"/>
+		<mkdir dir="${project.warcontent}"/>
+		<copy todir="${project.warcontent}">
+			<fileset dir="${project.webcontent}">
+				<exclude name="WEB-INF/classes/**/*.class"/>
+				<exclude name="**/cvss/*"/>
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<zip destfile="${project.warcontent}/javasrc.zip" compress="true">
+			<zipfileset dir="${project.src}" prefix="${javasrc}"/>
+		</zip>
+		<javac classpathref="project.class.path" destdir="${project.classes}" srcdir="${project.src}/" nowarn="on" />
+		<jar basedir="${project.warcontent}" jarfile="${project.dist}/${warname}.war"/>
+	</target>
+	
+	<target depends="init" name="create-extras">
+	<copy todir="${project.dist}"><fileset dir="${project.webextras}" ><include name="*"/><exclude name="source"/></fileset></copy>
+	</target>
+		
+	<target depends="create-war,create-extras,check-tomcat" name="tomcat-deploy">
+		<copy todir="${tomcat.webapps}" file="${project.dist}/${warname}.war" overwrite="true" failonerror="true"/>
+	</target>
+	
+	<target depends="create-war,create-extras" name="package">
+		
+		<zip destfile="${project.dist}/${packagesrc}.zip" compress="true">
+			 <zipfileset dir="." prefix="${packagename}">
+				<exclude name="temp/**"/>
+				<exclude name="tomcatJREbundle/jre*.zip"/>
+			 	<exclude name="dist/*"/> <!-- exclude name="${project.dist}/*"/> doesn't match the dist/ directory-->
+			 </zipfileset>
+		</zip>
+
+		
+		<zip destfile="${project.dist}/${packagename}-${DSTAMP}.zip" compress="true">
+			 <zipfileset dir="${project.dist}" prefix="${packagename}" excludes="*.zip"/>
+		</zip>
+		
+		
+		<zip destfile="${project.dist}/${packagenameWithTomcat}.zip" compress="true">
+			<zipfileset src="${project.tomcat.zip}" prefix="${packagenameWithTomcat}" 
+				excludes="${project.tomcat.zipbase}/webapps/ROOT/index.html"/>
+			<zipfileset src="${project.jre.zip}" prefix="${packagenameWithTomcat}" />
+			<zipfileset file="${project.dist}/${warname}.war" prefix="${packagenameWithTomcat}/${project.tomcat.zipbase}/webapps/" />
+			<zipfileset file="${project.dist}/${warname}.xml" prefix="${packagenameWithTomcat}/${project.tomcat.zipbase}/webapps/" />
+			<zipfileset file="${project.bundle}/index.html" prefix="${packagenameWithTomcat}/${project.tomcat.zipbase}/webapps/ROOT/" />
+			<zipfileset file="${project.bundle}/StartInsecureWebApp.bat" prefix="${packagenameWithTomcat}"/> 
+		</zip>
+
+		
+	</target>
+
+</project>

@@ -1,0 +1,92 @@
+echo off
+echo "You probably don't need to run this file :-)"
+echo This file trims the optional uneeded files from the JRE 1.5
+echo The list of files removed below is based on SUN's README document
+echo http://java.sun.com/j2se/1.5.0/jre/README
+echo that describes the redistribution requirements of the JRE
+
+
+SET TGT=%cd%\jre1.5.0_05-forTomcat5
+if exist %TGT%  goto goodTarget
+echo Directory %TGT% not found
+goto done
+
+:goodTarget
+REM 
+if not exist "%TGT%\bin\jdb.exe" goto needJDKfiles
+if not exist "%TGT%\bin\javac.exe" goto needJDKfiles
+if not exist "%TGT%\lib\tools.jar" goto needJDKfiles
+echo Required JDK files (javac,tools.jar) appear to be installed - Tomcat checks for these at startup
+goto deleteUnnecessary
+
+:needJDKfiles
+echo JDK files are missing (jdb,javac,tools.jar; see the source of this bat file for details) - Please copy these manually from JDK1.5 installation
+goto done
+
+:deleteUnnecessary
+echo "Trimming JRE %TGT%"
+DEL %TGT%\bin\javacpl.exe
+DEL %TGT%\bin\jucheck.exe
+DEL %TGT%\bin\jusched.exe
+
+DEL %TGT%\bin\JavaWebStart.dll
+DEL %TGT%\bin\NPJPI*.dll
+DEL %TGT%\bin\NPJava11.dll
+DEL %TGT%\bin\NPJava12.dll
+DEL %TGT%\bin\NPJava13.dll
+DEL %TGT%\bin\NPJava14.dll
+DEL %TGT%\bin\NPJava32.dll
+DEL %TGT%\bin\NPOJI610.dll
+DEL %TGT%\bin\RegUtils.dll
+DEL %TGT%\bin\axbridge.dll
+DEL %TGT%\bin\deploy.dll
+DEL %TGT%\bin\jpicom32.dll
+DEL %TGT%\bin\jpicpl32.cpl
+DEL %TGT%\bin\jpiexp32.dll
+DEL %TGT%\bin\jpinscp.dll
+DEL %TGT%\bin\jpioji.dll
+DEL %TGT%\bin\jpishare.dll
+DEL %TGT%\lib\deploy.jar
+DEL %TGT%\lib\plugin.jar
+DEL %TGT%\lib\javaws.jar
+DEL %TGT%\lib\javaws\messages.properties
+DEL %TGT%\lib\javaws\messages_de.properties
+DEL %TGT%\lib\javaws\messages_es.properties
+DEL %TGT%\lib\javaws\messages_fr.properties
+DEL %TGT%\lib\javaws\messages_it.properties
+DEL %TGT%\lib\javaws\messages_ja.properties
+DEL %TGT%\lib\javaws\messages_ko.properties
+DEL %TGT%\lib\javaws\messages_sv.properties
+DEL %TGT%\lib\javaws\messages_zh_CN.properties
+DEL %TGT%\lib\javaws\messages_zh_HK.properties
+DEL %TGT%\lib\javaws\messages_zh_TW.properties
+DEL %TGT%\lib\javaws\miniSplash.jpg
+
+
+REM  Java RMI Activation System Daemon
+DEL /Q %TGT%\bin\rmid.*
+REM  Java Remote Object Registry
+DEL /Q %TGT%\bin\rmiregistry.*
+REM  Java IDL Name Server
+DEL /Q %TGT%\bin\tnameserv.*
+REM  Key and Certificate Management Tool
+DEL /Q %TGT%\bin\keytool.*
+REM  Used to obtain and cache Kerberos ticket-granting tickets
+DEL /Q %TGT%\bin\kinit.*
+REM  Kerberos display entries in credentials cache and keytab
+DEL /Q %TGT%\bin\klist.*
+REM  Kerberos key table manager
+DEL /Q %TGT%\bin\ktab.*
+REM  Policy File Creation and Management Tool
+DEL /Q %TGT%\bin\policytool.*
+REM  Object Request Broker Daemon
+DEL /Q %TGT%\bin\orbd.*
+REM  Java IDL Server Tool
+DEL /Q %TGT%\bin\servertool.*
+REM   Java Web Start; Deleteing empty dir %TGT%\lib\javaws isn't working 
+DEL /Q %TGT%\bin\javaws.*
+DEL /Q /F %TGT%\lib\javaws
+DEL /Q %TGT%\lib\javaws.jar
+
+echo "Trim complete"
+:done

@@ -1,0 +1,2 @@
+Java is a Trademark of Sun Microsystems, Inc. (under various licenses).
+Other Trademarks are Trademarks of their respective owners.
